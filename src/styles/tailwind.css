@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for the WhatsApp clone */
+body {
+    @apply bg-white text-gray-800;
+}
+
+.chat-screen {
+    @apply flex flex-col h-screen p-4;
+}
+
+.chat-bubble {
+    @apply mb-2 p-3 rounded-lg;
+}
+
+.chat-bubble.sent {
+    @apply bg-blue-500 text-white self-end;
+}
+
+.chat-bubble.received {
+    @apply bg-gray-300 text-black self-start;
+}
+
+.typing-indicator {
+    @apply text-gray-500 italic;
+}
+
+.mode-love {
+    @apply bg-pink-200;
+}
+
+.mode-fight {
+    @apply bg-red-600;
+}
+
+.mode-sorry {
+    @apply bg-blue-300;
+}
+
+.countdown {
+    @apply text-lg font-bold;
+}
+
+.love-meter {
+    @apply text-xl font-semibold;
+}
