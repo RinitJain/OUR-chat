@@ -10,6 +10,7 @@ const Chat: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [messages, setMessages] = useState<any[]>([]);
+  const [replyMessage, setReplyMessage] = useState<any | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -34,6 +35,7 @@ const Chat: React.FC = () => {
           id: doc.id,
           sender: data.sender,
           message: data.text,
+          replyTo: data.replyTo || null,
           timestamp: timestamp
             ? timestamp.toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric' }) + 
               " " + timestamp.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true }) 
@@ -52,15 +54,17 @@ const Chat: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = async (text: string) => {
+  const sendMessage = async (text: string, replyTo?: string) => {
     if (!user || !text.trim()) return;
 
     try {
       await addDoc(collection(db, "messages"), {
         sender: user.displayName || user.email,
         text: text.trim(),
+        replyTo: replyTo || null,
         timestamp: serverTimestamp(),
       });
+      setReplyMessage(null); // Clear reply state after sending
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -77,15 +81,25 @@ const Chat: React.FC = () => {
       {/* 🔹 Chat Messages */}
       <div className="flex-1 overflow-y-auto p-4 mt-12 mb-16 space-y-4">
         {messages.length > 0 ? (
-          messages.map((msg) => (
-            <ChatBubble
-              key={msg.id}
-              sender={msg.sender}
-              message={msg.message}
-              timestamp={msg.timestamp}
-              isSender={msg.sender === (user?.displayName || user?.email)}
-            />
-          ))
+          messages.map((msg) => {
+            const repliedMessage = messages.find(m => m.id === msg.replyTo);
+            return (
+              <div key={msg.id}>
+                {repliedMessage && (
+                  <div className="ml-6 mb-1 p-2 border-l-4 border-gray-500 text-gray-400 text-sm">
+                    {repliedMessage.sender}: {repliedMessage.message}
+                  </div>
+                )}
+                <ChatBubble
+                  sender={msg.sender}
+                  message={msg.message}
+                  timestamp={msg.timestamp}
+                  isSender={msg.sender === (user?.displayName || user?.email)}
+                  onReply={() => setReplyMessage(msg)}
+                />
+              </div>
+            );
+          })
         ) : (
           <p className="text-center text-gray-400">No messages yet.</p>
         )}
@@ -93,7 +107,11 @@ const Chat: React.FC = () => {
       </div>
 
       {/* 🔹 Chat Input */}
-      <ChatInput onSendMessage={sendMessage} />
+      <ChatInput 
+        onSendMessage={(text) => sendMessage(text, replyMessage?.id)}
+        replyMessage={replyMessage?.message} 
+        clearReply={() => setReplyMessage(null)} 
+      />
     </div>
   );
 };

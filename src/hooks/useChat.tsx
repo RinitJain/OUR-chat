@@ -32,9 +32,10 @@ const useChat = (userId: string) => {
                     senderId: data.senderId,
                     type: data.type,
                     read: data.read,
+                    replyTo: data.replyTo || null,
                     timestamp: data.timestamp instanceof Timestamp
-                        ? data.timestamp.toMillis()  // ✅ Ensure it's a number
-                        : (typeof data.timestamp === "number" ? data.timestamp : Date.now()), // ✅ Default to number
+                        ? data.timestamp.toMillis()
+                        : (typeof data.timestamp === "number" ? data.timestamp : Date.now()),
                 } as Message;
             });
 
@@ -45,7 +46,7 @@ const useChat = (userId: string) => {
         return () => unsubscribe();
     }, []);
 
-    const sendMessage = async (messageContent: string, type: "text" | "image" | "gif" | "voice" = "text") => {
+    const sendMessage = async (messageContent: string, replyTo?: string, type: "text" | "image" | "gif" | "voice" = "text") => {
         if (!messageContent.trim()) return;
 
         await addDoc(collection(db, "messages"), {
@@ -53,6 +54,7 @@ const useChat = (userId: string) => {
             senderId: userId,
             type,
             read: false,
+            replyTo: replyTo || null,
             timestamp: serverTimestamp(),
         });
     };

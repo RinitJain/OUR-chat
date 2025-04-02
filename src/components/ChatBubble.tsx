@@ -1,32 +1,55 @@
 import React from "react";
+import { CornerUpLeft } from "lucide-react";
 
-interface ChatBubbleProps {
-    sender: string;
+type ChatBubbleProps = {
     message: string;
-    timestamp: string;
+    sender: string;
     isSender: boolean;
-    read?: boolean;
-}
+    timestamp: string;
+    onReply: () => void;
+    replyTo?: string | null;
+};
 
-const ChatBubble: React.FC<ChatBubbleProps> = ({ sender, message, timestamp, isSender, read }) => {
+const ChatBubble: React.FC<ChatBubbleProps> = ({
+    message,
+    sender,
+    isSender,
+    timestamp,
+    onReply,
+    replyTo,
+}) => {
     return (
-        <div className={`flex flex-col ${isSender ? "items-end" : "items-start"}`}>
-            {/* Sender Name */}
-            <span className="text-xs text-gray-400">{isSender ? "You" : sender}</span>
+        <div className={`flex items-center ${isSender ? "justify-end" : "justify-start"}`}>
+            {/* Reply Button for Sender (LEFT) */}
+            {isSender && (
+                <button onClick={onReply} className="mr-2 text-gray-400 hover:text-gray-600">
+                    <CornerUpLeft size={16} />
+                </button>
+            )}
 
-            {/* Message Bubble */}
             <div
-                className={`max-w-xs px-4 py-2 rounded-lg shadow-md text-white ${
-                    isSender ? "bg-blue-500" : "bg-gray-700"
-                }`}
+                className={`p-3 rounded-lg max-w-xs shadow-md 
+                ${isSender ? "bg-blue-500 text-white" : "bg-gray-500 text-white"}`}
             >
-                {message}
+                {/* Display Replied Message */}
+                {replyTo && (
+                    <div className="text-gray-300 text-xs border-l-4 border-gray-400 pl-2 mb-1">
+                        {replyTo}
+                    </div>
+                )}
+
+                <p>{message}</p>
+
+                {/* Timestamp */}
+                <div className="text-xs mt-1 text-gray-200">{timestamp}</div>
             </div>
 
-            {/* Timestamp & Read Receipt */}
-            <div className="text-xs text-gray-400 mt-1">
-                {timestamp} {isSender && read ? "✔✔" : ""}
-            </div>
+            {/* Reply Button for Receiver (RIGHT) */}
+            {!isSender && (
+                <button onClick={onReply} className="ml-2 text-gray-400 hover:text-gray-600">
+                    <CornerUpLeft size={16} />
+                </button>
+            )}
         </div>
     );
 };
