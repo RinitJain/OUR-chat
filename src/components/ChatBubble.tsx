@@ -8,7 +8,7 @@ type ChatBubbleProps = {
     timestamp: string;
     onReply: () => void;
     replyTo?: string | null;
-};
+}; 
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({
     message,
