@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import ChatBubble from "../components/ChatBubble";
 import ChatInput from "../components/ChatInput";
 import useChat from "../hooks/useChat";
@@ -16,8 +16,11 @@ const ChatScreen: React.FC = () => {
         return <div className="flex justify-center items-center h-screen text-white">Please log in to access chats.</div>;
     }
 
-    const { messages, sendMessage, typingIndicator } = useChat(userId);
+    const { messages, sendMessage, typingIndicator, toggleStar } = useChat(userId);
     const [replyMessage, setReplyMessage] = useState<string | null>(null);
+
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const [prevMessageCount, setPrevMessageCount] = useState<number>(0);
 
     return (
         <div className="h-screen flex flex-col bg-pink-200">
@@ -32,22 +35,30 @@ const ChatScreen: React.FC = () => {
                         hour: "2-digit", minute: "2-digit", hour12: true
                     });
 
-                    const senderName = msg.senderId.split("@")[0]; // Extract name before '@'
+                    const senderName = msg.senderId.split("@")[0];
 
                     return (
                         <ChatBubble
                             key={msg.id}
                             message={msg.content}
-                            sender={senderName} // Display only the name
+                            sender={senderName}
                             isSender={msg.senderId === userId}
                             timestamp={formattedTime}
                             onReply={() => setReplyMessage(msg.content)}
+                            starred={msg.star ?? false}
+                            onToggleStar={() => toggleStar(msg.id, msg.star ?? false)}
                         />
                     );
                 })}
                 {typingIndicator && <div className="text-gray-400 text-sm">Typing...</div>}
+                <div ref={messagesEndRef} />
             </div>
-            <ChatInput onSendMessage={sendMessage} replyMessage={replyMessage} clearReply={() => setReplyMessage(null)} />
+
+            <ChatInput
+                onSendMessage={sendMessage}
+                replyMessage={replyMessage}
+                clearReply={() => setReplyMessage(null)}
+            />
         </div>
     );
 };

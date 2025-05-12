@@ -5,6 +5,7 @@ export interface Message {
     timestamp: number;
     type: 'text' | 'image' | 'gif' | 'voice';
     read: boolean;
+    star?: boolean;
 }
 
 export interface User {
