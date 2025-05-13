@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES6", // ES6 is more commonly used, but ES2017 should work too.
+    "module": "commonjs", // Use commonjs for Node.js compatibility
+    "lib": ["es2017"], // Make sure it includes ES2017 for modern JavaScript features
+    "outDir": "lib", // Specifies the folder for compiled files
+    "esModuleInterop": true, // Allow for default imports in commonjs modules
+    "skipLibCheck": true, // Skip library checks to avoid issues like the one with Int32Array
+    "moduleResolution": "node", // Ensures proper resolution of node modules
+    "strict": true, // Enforce strict type-checking
+    "noImplicitReturns": true, // Make sure all functions return something
+    "noUnusedLocals": true, // Ensure no unused variables
+    "sourceMap": true // Useful for debugging
+  },
+  "include": [
+    "src/**/*.ts" // Include all TypeScript files in the src directory
+  ],
+  "exclude": [
+    "node_modules" // Exclude node_modules to prevent type-checking issues
+  ]
+}
